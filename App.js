@@ -1,12 +1,18 @@
 import { NavigationContainer } from "@react-navigation/native";
 import React from "react";
+import { AuthProvider } from "./hooks/useAuth";
 // import tw from "tailwind-rn";
 import StackNavigator from "./StackNavigator";
 
 export default function App() {
   return (
     <NavigationContainer>
-      <StackNavigator />
+      {/* aka HOC - Higher Order Component */}
+      <AuthProvider>
+        {/* where we WRAP some CHILD Component, and we pass down the AUTH info to the children */}
+
+        <StackNavigator />
+      </AuthProvider>
     </NavigationContainer>
 
     // <View style={tw("flex-1 justify-center items-center")}>
