@@ -1,15 +1,44 @@
 import React, { createContext, useContext } from "react";
 import { View, Text } from "react-native";
-// initial state of the context
+import * as Google from "expo-google-app-auth"; //see from expo-google-app-auth NPM wale se github wala documentation
+//combining google and firebase
 
+// initial state of the context
 const AuthContext = createContext({});
 
+const config = {
+  iosClientId:
+    "689137445225-sk11vafj5mrtbrjk8oeu4lj1v963i291.apps.googleusercontent.com",
+  androidClientId:
+    "689137445225-8heke5483topr83v0n7thjaujshqmrfi.apps.googleusercontent.com",
+  //adding scopes and permissions that we need from google auth
+  scopes: ["profile", "email"],
+  permissions: ["public_profile", "email", "gender", "location"],
+};
+
 export const AuthProvider = ({ children }) => {
+  const signInWithGoogle = async () => {
+    //allows us to CONNECT with Google's LOGIN,
+    //combine it with firebase to keep track of who's logged in!!!!!!!!
+
+    //returns a promise, no need to use await if we use then
+    Google.logInAsync(config).then(async (loginResult) => {
+      console.log("Login Result: ", loginResult);
+      if (loginResult.type === "success") {
+        console.log("Login success!!");
+        //login successful!
+        const { idToken, accessToken } = loginResult;
+      }
+    });
+  };
+
   //we pass data store in value
   return (
     <AuthContext.Provider
       value={{
-        user: "Abhiram",
+        user: null,
+        //auth value above
+        signInWithGoogle, // => CHANGE THE GOOGLE TO OTHER AUTHS BY CHANGING THIS FUNCTION CALL
       }}
     >
       {children}
