@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import {
   GoogleAuthProvider,
@@ -26,7 +26,44 @@ const config = {
 export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
+  const [user, setUser] = useState(null);
+
+  // as we reload, we can see our login screen until firebase gets updated with the login info
+  // so we add loading : somewhat similar to the screen we see in whatsapp/insta/etc...
+  const [loadingInitial, setLoadingInitial] = useState(true);
+
+  //mid loading logics on UI, global loading other than this
+  const [loading, setLoading] = useState(false);
+
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, (user) => {
+        // const unsub =
+        if (user) {
+          //logged in
+          setUser(user);
+        } else {
+          // not logged in or signed out
+          setUser(null);
+        }
+
+        setLoadingInitial(false);
+      }),
+
+    // return unsub;
+    []
+  );
+
+  const logout = () => {
+    setLoading(true);
+    signOut(auth)
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
+  };
+
   const signInWithGoogle = async () => {
+    setLoading(true);
+
     //allows us to CONNECT with Google's LOGIN,
     //combine it with firebase to keep track of who's logged in!!!!!!!!
 
@@ -47,20 +84,25 @@ export const AuthProvider = ({ children }) => {
 
         return Promise.reject();
       })
-      .catch((error) => setError(error));
-    // .finally(())
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
   };
 
   //we pass data store in value
   return (
     <AuthContext.Provider
       value={{
-        user: null,
+        // user: null,
+        user,
         //auth value above
         signInWithGoogle, // => CHANGE THE GOOGLE TO OTHER AUTHS BY CHANGING THIS FUNCTION CALL
+        loading,
+        error,
+        logout,
       }}
     >
-      {children}
+      {/* this is like settings for wrapping the whole app */}
+      {!loadingInitial && children}
     </AuthContext.Provider>
   );
 };
