@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { View, Text } from "react-native";
 import {
   GoogleAuthProvider,
@@ -88,18 +94,24 @@ export const AuthProvider = ({ children }) => {
       .finally(() => setLoading(false));
   };
 
+  const memoedValue = useMemo(
+    () => ({ user, loading, error, signInWithGoogle, logout }),
+    [user, loading, error]
+  );
+
   //we pass data store in value
   return (
     <AuthContext.Provider
-      value={{
-        // user: null,
-        user,
-        //auth value above
-        signInWithGoogle, // => CHANGE THE GOOGLE TO OTHER AUTHS BY CHANGING THIS FUNCTION CALL
-        loading,
-        error,
-        logout,
-      }}
+      value={memoedValue}
+      // value={{
+      //   // user: null,
+      //   user,
+      //   //auth value above
+      //   signInWithGoogle, // => CHANGE THE GOOGLE TO OTHER AUTHS BY CHANGING THIS FUNCTION CALL
+      //   loading,
+      //   error,
+      //   logout,
+      // }}
     >
       {/* this is like settings for wrapping the whole app */}
       {!loadingInitial && children}
