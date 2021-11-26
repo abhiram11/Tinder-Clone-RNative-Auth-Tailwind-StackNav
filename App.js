@@ -1,7 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import React from "react";
 import { AuthProvider } from "./hooks/useAuth";
-// import tw from "tailwind-rn";
 import { LogBox } from "react-native";
 LogBox.ignoreAllLogs();
 import StackNavigator from "./StackNavigator";
