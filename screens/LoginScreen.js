@@ -18,11 +18,11 @@ const LoginScreen = () => {
 
   const navigation = useNavigation(); //redirect user
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, []);
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     headerShown: false,
+  //   });
+  // }, []);
 
   return (
     <View style={tw("flex-1")}>
