@@ -1,8 +1,15 @@
 import { useNavigation } from "@react-navigation/core";
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import tw from "tailwind-rn";
 
-import { View, Text, Button, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+} from "react-native";
 import useAuth from "../hooks/useAuth";
 
 //importing icons that come preinstalled in expo
@@ -13,6 +20,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
   console.log(user);
+  const swipeRef = useRef(null);
 
   // useLayoutEffect(() => {
   //   navigation.setOptions({ headerShown: false });
@@ -81,43 +89,114 @@ const HomeScreen = () => {
 
       {/* end of header */}
 
-      {/* SWIPER HERE */}
-
       {/* CARDS */}
       <View style={tw("flex-1 -mt-6")}>
         <Swiper
+          ref={swipeRef}
           containerStyle={{ backgroundColor: "transparent" }}
           cards={DUMMY_DATA}
           stackSize={5}
           cardIndex={0} //starts at zero, helps a lot later
           verticalSwipe={false}
+          //adding SWIPE FUNCTIONS
+
+          onSwipedLeft={() => {
+            console.log("SWIPED NOPE!");
+          }}
+          onSwipedRight={() => {
+            console.log("SWiped MATCH!");
+          }}
+          //ending SWIPE FUNCTIONS
+          backgroundColor={"#4FD0E9"}
+          overlayLabels={{
+            left: {
+              title: "NOPE",
+              style: {
+                label: {
+                  textAlign: "right", //by default its to the left
+                  color: "red",
+                },
+              },
+            },
+            right: {
+              title: "MATCH",
+
+              style: {
+                label: {
+                  color: "#4DED30",
+                },
+              },
+            },
+          }}
           animateCardOpacity //swipe out animation comes in for stack size and cards behind it
           renderCard={(card) => (
             <View
               key={card.fakeId}
               style={tw("relative bg-white h-3/4 rounded-xl")}
             >
-              {/* <Text>{card.firstName}</Text> */}
               <Image
                 source={{ uri: card.photoURL }}
                 style={tw("absolute top-0 h-full w-full rounded-xl")}
               />
+              {/* Profile Description below the image */}
+              <View
+                style={[
+                  tw(
+                    "absolute bottom-0 flex-row bg-white justify-between items-center w-full h-20 px-6 py-2 rounded-b-xl"
+                  ),
+                  styles.cardShadow,
+                ]}
+              >
+                <View>
+                  <Text style={tw("text-xl font-bold")}>
+                    {card.firstName} {card.lastName}
+                  </Text>
+                  <Text>{card.occupation}</Text>
+                </View>
+                <Text style={tw("text-2xl font-bold")}>{card.age}</Text>
+              </View>
             </View>
           )}
         />
       </View>
 
-      {/* <View style={{ marginTop: 60, borderTopWidth: 1, borderStyle: "solid" }}>
-        <Text>I am the home screen!</Text>
-        <Button
-          title="Go to Chat Screen"
-          onPress={() => navigation.navigate("Chat")}
-        />
+      {/* useRef buttons here */}
+      <View style={tw("flex flex-row justify-evenly")}>
+        <TouchableOpacity
+          onPress={() => swipeRef.current.swipeLeft()}
+          style={tw(
+            "items-center justify-center rounded-full w-16 h-16 bg-red-200"
+          )}
+        >
+          <Entypo name="cross" size={30} color="#FF5864" />
+        </TouchableOpacity>
 
-        <Button title="Logout" onPress={logout} />
-      </View> */}
+        <TouchableOpacity
+          onPress={() => swipeRef.current.swipeRight()}
+          style={tw(
+            "items-center justify-center rounded-full w-16 h-16 bg-green-200"
+          )}
+        >
+          <AntDesign name="heart" size={30} color="green" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 export default HomeScreen;
+
+//for shadows since not in tailwind RN
+const styles = StyleSheet.create({
+  cardShadow: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+
+    elevation: 2,
+  },
+});
