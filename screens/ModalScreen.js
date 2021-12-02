@@ -24,7 +24,7 @@ const ModalScreen = () => {
       //pull the following data from the mentioned collection (users) and given uid
 
       //TODO error => right hand side me hi kuch error hogi
-      id: user.id,
+      id: user.uid,
       displayName: user.displayName,
       photoURL: image,
       job: job,
