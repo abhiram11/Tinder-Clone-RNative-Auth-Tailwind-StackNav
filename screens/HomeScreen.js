@@ -15,7 +15,15 @@ import useAuth from "../hooks/useAuth";
 //importing icons that come preinstalled in expo
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
-import { collection, doc, onSnapshot } from "@firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  query,
+  setDoc,
+  where,
+} from "@firebase/firestore";
 import { db } from "../firebase";
 
 const HomeScreen = () => {
@@ -53,22 +61,82 @@ const HomeScreen = () => {
     let unsub;
 
     const fetchCards = async () => {
-      unsub = onSnapshot(collection(db, "users"), (snapshot) => {
-        setProfiles(
-          //map through the array and build objecy
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-        );
-      });
+      //fetch previously NOPED cards
+      //this is not realtime, since for that we use onSnapshot and not getDocs
+
+      //TODO await THESE MFs
+      const passes = await getDocs(
+        collection(db, "users", user.uid, "passes")
+      ).then(
+        //this is IMPLICIT RETURN THAT'S WHY NO BRACKETS USED BELOW
+        (snapshot) => snapshot.docs.map((doc) => doc.id) //all IDs of the passes/nopes are mapped into passes array
+      );
+      const swipes = await getDocs(
+        collection(db, "users", user.uid, "swipes")
+      ).then((snapshot) => snapshot.docs.map((doc) => doc.id));
+
+      //TODO when QUERYING on DB, cant pass EMPTY ARRAY, value is required!
+      const passedUserIds = passes.length > 0 ? passes : ["test"];
+      const swipedUserIds = passes.length > 0 ? swipes : ["test"];
+
+      console.log([...passedUserIds, ...swipedUserIds]);
+      unsub = onSnapshot(
+        query(
+          collection(db, "users"),
+          where("id", "not-in", [...passedUserIds, ...swipedUserIds])
+        ), //[...] because we adding swiped/YES IDS as well, so remove swiped people ALL IN ALL
+        (snapshot) => {
+          setProfiles(
+            //map through the array and build object
+
+            //before the map, filter the USER that is logged in here
+            snapshot.docs
+              .filter((doc) => doc.id !== user.uid)
+              .map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }))
+          );
+        }
+      );
     };
     fetchCards();
 
     return unsub;
-  }, []);
+  }, [db]);
 
-  console.log("Profiles:", profiles);
+  // console.log("Profiles:", profiles);
+
+  const swipeLeft = (cardIndex) => {
+    //adds record in THEIR
+    if (!profiles[cardIndex]) return;
+    //if swiped on card, if card isnt in profiles[], dont interact with DB
+
+    const userSwiped = profiles[cardIndex];
+    console.log(`You swiped NOOPE on ${userSwiped.displayName}`);
+
+    //TODO go into the database->users->userID->passes/NOPES collection of this particular user->userSwiped ki ID
+    setDoc(
+      doc(db, "users", user.uid, "passes", userSwiped.id),
+      userSwiped //passed ALL INFO OF THE USER HERE
+    );
+  };
+  const swipeRight = async (cardIndex) => {
+    if (!profiles.cardIndex) return;
+
+    //get that user's data
+    const userSwiped = profiles[cardIndex];
+
+    //user has swiped
+    console.log(`You SWIPED for MATCH on ${userSwiped.displayName}`);
+
+    setDoc(doc(db, "users", user.uid, "swipes", userSwiped.id), userSwiped);
+
+    // const loggedInProfile =  await (
+    //   await getDocs(doc(db, "users", user.id))
+    // ).data();
+  };
+
   // useLayoutEffect(() => {
   //   navigation.setOptions({ headerShown: false });
   // }, []);
@@ -76,35 +144,35 @@ const HomeScreen = () => {
   //TODO
   //earlier called occupation, now called job
   //firstname and last name converted to displayName
-  const DUMMY_DATA = [
-    {
-      firstName: "Abhiram",
-      lastName: "Satpute",
-      job: "Chief Technology Officer",
-      photoURL:
-        "https://avatars.githubusercontent.com/u/20269286?s=400&u=bce2509c4f3fd8766d14e52755dfbdf358705236&v=4",
-      age: 25,
-      fakeId: 1,
-    },
-    {
-      firstName: "Elon",
-      lastName: "Musk",
-      occupation: "Extra Terrestrial Officer",
-      photoURL:
-        "https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg",
-      age: 125,
-      fakeId: 2,
-    },
-    {
-      firstName: "James",
-      lastName: "Bond",
-      occupation: "007",
-      photoURL:
-        "https://avatars.githubusercontent.com/u/20269286?s=400&u=bce2509c4f3fd8766d14e52755dfbdf358705236&v=4",
-      age: 25,
-      fakeId: 3,
-    },
-  ];
+  // const DUMMY_DATA = [
+  //   {
+  //     firstName: "Abhiram",
+  //     lastName: "Satpute",
+  //     job: "Chief Technology Officer",
+  //     photoURL:
+  //       "https://avatars.githubusercontent.com/u/20269286?s=400&u=bce2509c4f3fd8766d14e52755dfbdf358705236&v=4",
+  //     age: 25,
+  //     fakeId: 1,
+  //   },
+  //   {
+  //     firstName: "Elon",
+  //     lastName: "Musk",
+  //     occupation: "Extra Terrestrial Officer",
+  //     photoURL:
+  //       "https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg",
+  //     age: 125,
+  //     fakeId: 2,
+  //   },
+  //   {
+  //     firstName: "James",
+  //     lastName: "Bond",
+  //     occupation: "007",
+  //     photoURL:
+  //       "https://avatars.githubusercontent.com/u/20269286?s=400&u=bce2509c4f3fd8766d14e52755dfbdf358705236&v=4",
+  //     age: 25,
+  //     fakeId: 3,
+  //   },
+  // ];
 
   return (
     <View style={tw("flex-1 my-5")}>
@@ -151,11 +219,14 @@ const HomeScreen = () => {
           verticalSwipe={false}
           //adding SWIPE FUNCTIONS
 
-          onSwipedLeft={() => {
+          //TODO pass the cardINDEX along with the swipe, so we know which card got what swiped
+          onSwipedLeft={(cardIndex) => {
             console.log("SWIPED NOPE!");
+            swipeLeft(cardIndex);
           }}
-          onSwipedRight={() => {
+          onSwipedRight={(cardIndex) => {
             console.log("SWiped MATCH!");
+            swipeRight(cardIndex);
           }}
           //ending SWIPE FUNCTIONS
           backgroundColor={"#4FD0E9"}
