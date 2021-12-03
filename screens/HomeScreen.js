@@ -18,13 +18,16 @@ import Swiper from "react-native-deck-swiper";
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
   query,
+  serverTimestamp,
   setDoc,
   where,
 } from "@firebase/firestore";
 import { db } from "../firebase";
+import generatedID from "../lib/generateId";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -127,14 +130,62 @@ const HomeScreen = () => {
     //get that user's data
     const userSwiped = profiles[cardIndex];
 
-    //user has swiped
-    console.log(`You SWIPED for MATCH on ${userSwiped.displayName}`);
+    const loggedInProfile =
+      await //TODO once first AWAIT is loaded, then get data from second AWAIT
+      (await getDoc(doc(db, "users", user.id))).data();
 
-    setDoc(doc(db, "users", user.uid, "swipes", userSwiped.id), userSwiped);
+    //Check if user swiped on you...
+    //TODO IMPORTANT 3:56:45
+    //A MATCH MADE SHOULD BE ON SERVER (put this code on cloud), else
+    //people can see other people's matches
 
-    // const loggedInProfile =  await (
-    //   await getDocs(doc(db, "users", user.id))
-    // ).data();
+    //BEWARE of UID vs ID here
+    getDoc(doc(db, "users", userSwiped.id, "swipes", user.uid)).then(
+      (documentSnapshot) => {
+        if (documentSnapshot.exists()) {
+          //user already swiped on you => MATCH!
+          console.log(`YOU MATCHED WITH ${userSwiped.displayName}`);
+
+          //swipe recorded first
+          setDoc(
+            doc(db, "users", user.uid, "swipes", userSwiped.id),
+            userSwiped
+          );
+
+          //create the MATCH!
+          //TODO user1.uid+user2.uid = matchID WHICH will always be unique !
+
+          setDoc(doc(db, "matches", generatedID(user.uid, userSwiped.id)), {
+            //info to be set,
+            //TODO IMPORTANT PART
+
+            users: {
+              //object, not array
+              [user.uid]: loggedInProfile,
+              [userSwiped.uid]: userSwiped, //tell which user is which
+            },
+
+            usersMatched: [user.uid, userSwiped.id], //string comparison check
+            timestamp: serverTimestamp(),
+          });
+
+          navigation.navigate("Match", {
+            //TODO Navigation() can be used to pass values as PROPS
+            loggedInProfile,
+            userSwiped,
+          });
+        } else {
+          //you swiped as the first of the two, or didnt get swiped
+          //user has swiped
+          console.log(`You SWIPED for MATCH on ${userSwiped.displayName}`);
+
+          setDoc(
+            doc(db, "users", user.uid, "swipes", userSwiped.id),
+            userSwiped
+          );
+        }
+      }
+    );
   };
 
   // useLayoutEffect(() => {
