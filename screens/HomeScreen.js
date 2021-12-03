@@ -15,13 +15,13 @@ import useAuth from "../hooks/useAuth";
 //importing icons that come preinstalled in expo
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
-import { doc, onSnapshot } from "@firebase/firestore";
+import { collection, doc, onSnapshot } from "@firebase/firestore";
 import { db } from "../firebase";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
-  console.log(user);
+  // console.log(user);
   const swipeRef = useRef(null);
 
   //for mapping on the cards, replacing the DUMMY_DATA with the data from the database
@@ -34,10 +34,10 @@ const HomeScreen = () => {
         //if personal details not filled, prompt the MODAL SCREEN
         // TODO    user.uid = for the user who has logged in
         // const unsub = onSnapshot(doc(db, "users", user.uid), (snapshot) => {
-        console.log(
-          "````````````````Snapshot:`````````````````````````",
-          snapshot
-        );
+        // console.log(
+        //   "````````````````Snapshot:`````````````````````````",
+        //   snapshot
+        // );
 
         if (!snapshot.exists()) {
           navigation.navigate("Modal");
@@ -49,17 +49,38 @@ const HomeScreen = () => {
   // return unsub();
   // }, []);
 
-  // useEffect(() => {}, []);
+  useEffect(() => {
+    let unsub;
 
+    const fetchCards = async () => {
+      unsub = onSnapshot(collection(db, "users"), (snapshot) => {
+        setProfiles(
+          //map through the array and build objecy
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+        );
+      });
+    };
+    fetchCards();
+
+    return unsub;
+  }, []);
+
+  console.log("Profiles:", profiles);
   // useLayoutEffect(() => {
   //   navigation.setOptions({ headerShown: false });
   // }, []);
 
+  //TODO
+  //earlier called occupation, now called job
+  //firstname and last name converted to displayName
   const DUMMY_DATA = [
     {
       firstName: "Abhiram",
       lastName: "Satpute",
-      occupation: "Chief Technology Officer",
+      job: "Chief Technology Officer",
       photoURL:
         "https://avatars.githubusercontent.com/u/20269286?s=400&u=bce2509c4f3fd8766d14e52755dfbdf358705236&v=4",
       age: 25,
@@ -181,9 +202,9 @@ const HomeScreen = () => {
                 >
                   <View>
                     <Text style={tw("text-xl font-bold")}>
-                      {card.firstName} {card.lastName}
+                      {card.displayName}
                     </Text>
-                    <Text>{card.occupation}</Text>
+                    <Text>{card.job}</Text>
                   </View>
                   <Text style={tw("text-2xl font-bold")}>{card.age}</Text>
                 </View>

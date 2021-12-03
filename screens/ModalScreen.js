@@ -6,6 +6,8 @@ import tw from "tailwind-rn";
 import { db } from "../firebase";
 import useAuth from "../hooks/useAuth";
 
+// TODO there are full screen modal and also normal modal
+
 const ModalScreen = () => {
   const { user } = useAuth();
   const navigation = useNavigation();
@@ -19,7 +21,7 @@ const ModalScreen = () => {
     //firebase v9 MODULAR Functions
     //users keys used
 
-    console.log("Values:", user);
+    // console.log("Values:", user);
     setDoc(doc(db, "users", user.uid), {
       //pull the following data from the mentioned collection (users) and given uid
 

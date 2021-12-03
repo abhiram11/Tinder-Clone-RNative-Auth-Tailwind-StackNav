@@ -76,9 +76,9 @@ export const AuthProvider = ({ children }) => {
     //returns a promise, no need to use await if we use then
     await Google.logInAsync(config)
       .then(async (loginResult) => {
-        console.log("Login Result: ", loginResult);
+        // console.log("Login Result: ", loginResult);
         if (loginResult.type === "success") {
-          console.log("Login success!!");
+          // console.log("Login success!!");
           //login successful!
           const { idToken, accessToken } = loginResult;
           const credential = GoogleAuthProvider.credential(
