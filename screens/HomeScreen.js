@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/core";
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import tw from "tailwind-rn";
 
 import {
@@ -15,12 +15,41 @@ import useAuth from "../hooks/useAuth";
 //importing icons that come preinstalled in expo
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
+import { doc, onSnapshot } from "@firebase/firestore";
+import { db } from "../firebase";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
   console.log(user);
   const swipeRef = useRef(null);
+
+  //for mapping on the cards, replacing the DUMMY_DATA with the data from the database
+  const [profiles, setProfiles] = useState([]);
+
+  //when components paints on screen, refactor/use useffect can also be used
+  useLayoutEffect(
+    () =>
+      onSnapshot(doc(db, "users", user.uid), (snapshot) => {
+        //if personal details not filled, prompt the MODAL SCREEN
+        // TODO    user.uid = for the user who has logged in
+        // const unsub = onSnapshot(doc(db, "users", user.uid), (snapshot) => {
+        console.log(
+          "````````````````Snapshot:`````````````````````````",
+          snapshot
+        );
+
+        if (!snapshot.exists()) {
+          navigation.navigate("Modal");
+        }
+      }),
+    []
+  );
+
+  // return unsub();
+  // }, []);
+
+  // useEffect(() => {}, []);
 
   // useLayoutEffect(() => {
   //   navigation.setOptions({ headerShown: false });
@@ -94,7 +123,8 @@ const HomeScreen = () => {
         <Swiper
           ref={swipeRef}
           containerStyle={{ backgroundColor: "transparent" }}
-          cards={DUMMY_DATA}
+          cards={profiles}
+          // cards={DUMMY_DATA}
           stackSize={5}
           cardIndex={0} //starts at zero, helps a lot later
           verticalSwipe={false}
@@ -129,34 +159,57 @@ const HomeScreen = () => {
             },
           }}
           animateCardOpacity //swipe out animation comes in for stack size and cards behind it
-          renderCard={(card) => (
-            <View
-              key={card.fakeId}
-              style={tw("relative bg-white h-3/4 rounded-xl")}
-            >
-              <Image
-                source={{ uri: card.photoURL }}
-                style={tw("absolute top-0 h-full w-full rounded-xl")}
-              />
-              {/* Profile Description below the image */}
+          //TODO if cards available then do this
+          renderCard={(card) =>
+            card ? (
+              <View
+                key={card.fakeId}
+                style={tw("relative bg-white h-3/4 rounded-xl")}
+              >
+                <Image
+                  source={{ uri: card.photoURL }}
+                  style={tw("absolute top-0 h-full w-full rounded-xl")}
+                />
+                {/* Profile Description below the image */}
+                <View
+                  style={[
+                    tw(
+                      "absolute bottom-0 flex-row bg-white justify-between items-center w-full h-20 px-6 py-2 rounded-b-xl"
+                    ),
+                    styles.cardShadow,
+                  ]}
+                >
+                  <View>
+                    <Text style={tw("text-xl font-bold")}>
+                      {card.firstName} {card.lastName}
+                    </Text>
+                    <Text>{card.occupation}</Text>
+                  </View>
+                  <Text style={tw("text-2xl font-bold")}>{card.age}</Text>
+                </View>
+              </View>
+            ) : (
               <View
                 style={[
                   tw(
-                    "absolute bottom-0 flex-row bg-white justify-between items-center w-full h-20 px-6 py-2 rounded-b-xl"
+                    "relative bg-white h-1/4 rounded-xl justify-center items-center"
+                    //h-3/4 do it later
                   ),
                   styles.cardShadow,
                 ]}
               >
-                <View>
-                  <Text style={tw("text-xl font-bold")}>
-                    {card.firstName} {card.lastName}
-                  </Text>
-                  <Text>{card.occupation}</Text>
-                </View>
-                <Text style={tw("text-2xl font-bold")}>{card.age}</Text>
+                <Text style={tw("font-bold pb-5")}>No More Profiles :(</Text>
+                {/* <Image
+                  style={tw("h-20 w-full")}
+                  height={100}
+                  width={100}
+                  source={{
+                    uri: "https://cdn.shopify.com/s/files/1/1061/1924/products/Crying_Emoji_Icon_548f640f-8622-4d07-ad75-053eb5cf3b03_large.png?v=1571606090",
+                  }}
+                /> */}
               </View>
-            </View>
-          )}
+            )
+          }
         />
       </View>
 
