@@ -5,6 +5,8 @@ import { LogBox } from "react-native";
 LogBox.ignoreAllLogs();
 import StackNavigator from "./StackNavigator";
 
+//3:05:00 part important with teeny tiny bits
+
 export default function App() {
   return (
     <NavigationContainer>
