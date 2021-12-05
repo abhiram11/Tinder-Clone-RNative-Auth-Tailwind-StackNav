@@ -27,7 +27,7 @@ import {
   where,
 } from "@firebase/firestore";
 import { db } from "../firebase";
-import generatedID from "../lib/generateId";
+import generatedId from "../lib/generateId";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -125,15 +125,19 @@ const HomeScreen = () => {
     );
   };
   const swipeRight = async (cardIndex) => {
-    if (!profiles.cardIndex) return;
+    if (!profiles[cardIndex]) return;
 
     //get that user's data
     const userSwiped = profiles[cardIndex];
 
-    const loggedInProfile =
-      await //TODO once first AWAIT is loaded, then get data from second AWAIT
-      (await getDoc(doc(db, "users", user.id))).data();
+    console.log("USERSWIPED:", userSwiped);
+    console.log("USER:", user);
 
+    //TODO once first AWAIT is loaded, then get data from second AWAIT
+    const loggedInProfile = await (
+      await getDoc(doc(db, "users", user.uid))
+    ).data();
+    console.log("Logged In", loggedInProfile);
     //Check if user swiped on you...
     //TODO IMPORTANT 3:56:45
     //A MATCH MADE SHOULD BE ON SERVER (put this code on cloud), else
@@ -155,9 +159,8 @@ const HomeScreen = () => {
           //create the MATCH!
           //TODO user1.uid+user2.uid = matchID WHICH will always be unique !
 
-          setDoc(doc(db, "matches", generatedID(user.uid, userSwiped.id)), {
-            //info to be set,
-            //TODO IMPORTANT PART
+          setDoc(doc(db, "matches", generatedId(user.uid, userSwiped.id)), {
+            //info to be set, //TODO IMPORTANT PART
 
             users: {
               //object, not array
@@ -188,43 +191,6 @@ const HomeScreen = () => {
     );
   };
 
-  // useLayoutEffect(() => {
-  //   navigation.setOptions({ headerShown: false });
-  // }, []);
-
-  //TODO
-  //earlier called occupation, now called job
-  //firstname and last name converted to displayName
-  // const DUMMY_DATA = [
-  //   {
-  //     firstName: "Abhiram",
-  //     lastName: "Satpute",
-  //     job: "Chief Technology Officer",
-  //     photoURL:
-  //       "https://avatars.githubusercontent.com/u/20269286?s=400&u=bce2509c4f3fd8766d14e52755dfbdf358705236&v=4",
-  //     age: 25,
-  //     fakeId: 1,
-  //   },
-  //   {
-  //     firstName: "Elon",
-  //     lastName: "Musk",
-  //     occupation: "Extra Terrestrial Officer",
-  //     photoURL:
-  //       "https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg",
-  //     age: 125,
-  //     fakeId: 2,
-  //   },
-  //   {
-  //     firstName: "James",
-  //     lastName: "Bond",
-  //     occupation: "007",
-  //     photoURL:
-  //       "https://avatars.githubusercontent.com/u/20269286?s=400&u=bce2509c4f3fd8766d14e52755dfbdf358705236&v=4",
-  //     age: 25,
-  //     fakeId: 3,
-  //   },
-  // ];
-
   return (
     <View style={tw("flex-1 my-5")}>
       {/* header */}
@@ -247,7 +213,6 @@ const HomeScreen = () => {
             style={tw("h-14 w-14 rounded-full")}
           />
         </TouchableOpacity>
-
         <TouchableOpacity
           style={tw("absolute right-5 top-3")}
           onPress={() => navigation.navigate("Chat")}
@@ -396,3 +361,40 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 });
+
+// useLayoutEffect(() => {
+//   navigation.setOptions({ headerShown: false });
+// }, []);
+
+//TODO
+//earlier called occupation, now called job
+//firstname and last name converted to displayName
+// const DUMMY_DATA = [
+//   {
+//     firstName: "Abhiram",
+//     lastName: "Satpute",
+//     job: "Chief Technology Officer",
+//     photoURL:
+//       "https://avatars.githubusercontent.com/u/20269286?s=400&u=bce2509c4f3fd8766d14e52755dfbdf358705236&v=4",
+//     age: 25,
+//     fakeId: 1,
+//   },
+//   {
+//     firstName: "Elon",
+//     lastName: "Musk",
+//     occupation: "Extra Terrestrial Officer",
+//     photoURL:
+//       "https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg",
+//     age: 125,
+//     fakeId: 2,
+//   },
+//   {
+//     firstName: "James",
+//     lastName: "Bond",
+//     occupation: "007",
+//     photoURL:
+//       "https://avatars.githubusercontent.com/u/20269286?s=400&u=bce2509c4f3fd8766d14e52755dfbdf358705236&v=4",
+//     age: 25,
+//     fakeId: 3,
+//   },
+// ];
