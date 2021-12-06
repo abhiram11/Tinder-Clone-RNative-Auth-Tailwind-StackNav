@@ -1,6 +1,13 @@
-import { addDoc, collection, serverTimestamp } from "@firebase/firestore";
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "@firebase/firestore";
 import { useRoute } from "@react-navigation/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -27,8 +34,29 @@ const MessageScreen = () => {
 
   const { matchDetails } = params;
 
+  //real time listener of chats ========= useEffect and onSnapshot!!!!!!!!
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, "matches", matchDetails.id, "messages"),
+          orderBy("timestamp", "desc")
+        ),
+        (snapshot) =>
+          setMessages(
+            snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))
+          )
+      ),
+    [matchDetails, db]
+  );
+
   const sendMessage = () => {
     //make it async and then put .then with setInput(""), if there is error restore the input
+    //but it will wait till the update on database is done, that's why avoided
+    //so now it feels like done in an instant
     addDoc(collection(db, "matches", matchDetails.id, "messages"), {
       //represent the msgs here
       timestamp: serverTimestamp(),
@@ -59,6 +87,7 @@ const MessageScreen = () => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <FlatList
             data={messages}
+            inverted={-1} // TODO else it fills the text on top, has to be at bottom
             style={tw("pl-4")}
             keyExtractor={(item) => item.id}
             renderItem={({ item: message }) =>
