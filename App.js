@@ -6,6 +6,7 @@ LogBox.ignoreAllLogs();
 import StackNavigator from "./StackNavigator";
 
 //3:05:00 part important with teeny tiny bits
+//4:40:00 destructuring firebase data, old data copied to new object to update
 
 export default function App() {
   return (
