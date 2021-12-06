@@ -4,6 +4,8 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import useAuth from "../hooks/useAuth";
 import getMatchedUserInfo from "../lib/getMatchedUserInfo";
 import tw from "tailwind-rn";
+import { db } from "../firebase";
+import { collection, onSnapshot, orderBy, query } from "@firebase/firestore";
 
 const ChatRow = ({ matchDetails }) => {
   const navigation = useNavigation();
@@ -11,12 +13,28 @@ const ChatRow = ({ matchDetails }) => {
 
   //use utility fn to remove the other users info from the collection match
   const [matchedUserInfo, setMatchedUserInfo] = useState(null);
+  const [lastMessage, setLastMessage] = useState("");
 
   console.log("matchDetails.user, user.uid", matchDetails.user, user.uid);
 
   useEffect(() => {
     setMatchedUserInfo(getMatchedUserInfo(matchDetails.user, user.uid));
   }, [matchDetails, user]);
+
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, "matches", matchDetails.id, "messages"),
+          orderBy("timestamp", "desc")
+        ),
+        (snapshot) => {
+          setLastMessage(snapshot.docs[0]?.data().message);
+        } // 0th index as we used desc order in CHATS
+        //using ? because if there is no message, it will be undefined
+      ),
+    [matchDetails, db]
+  );
 
   console.log("matcheduserinfo:", matchedUserInfo);
   return (
@@ -40,7 +58,7 @@ const ChatRow = ({ matchDetails }) => {
         <Text style={tw("text-lg font-semibold")}>
           {matchedUserInfo?.displayName}
         </Text>
-        <Text>Say Hi!</Text>
+        <Text>{lastMessage || "Say Hi!"}</Text>
       </View>
     </TouchableOpacity>
   );

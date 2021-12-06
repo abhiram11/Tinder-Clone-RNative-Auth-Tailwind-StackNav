@@ -9,6 +9,7 @@ import StackNavigator from "./StackNavigator";
 //4:40:00 destructuring firebase data, old data copied to new object to update
 //5:23:00 firebase query and using orderby for the chat messages
 //5:27:40 FIRESTORE USES WEBSOCKET TO CONNECT AND STUFF
+//5:31:00 use LIMIT
 
 export default function App() {
   return (
