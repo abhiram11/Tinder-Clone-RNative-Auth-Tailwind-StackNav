@@ -10,9 +10,9 @@ const ChatScreen = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={{ marginTop: 60 }}>
-      <Text>I am the chat screen!</Text>
-      <Header title="Chat" callEnabled />
+    <View style={{ marginTop: 20 }}>
+      {/* <Text>I am the chat screen!</Text> */}
+      <Header title="Chat" />
       <ChatList />
       <Button
         title="Go Back to Home Screen"

@@ -27,7 +27,7 @@ import {
   where,
 } from "@firebase/firestore";
 import { db } from "../firebase";
-import generatedId from "../lib/generateId";
+import generateId from "../lib/generateId";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -57,9 +57,6 @@ const HomeScreen = () => {
     []
   );
 
-  // return unsub();
-  // }, []);
-
   useEffect(() => {
     let unsub;
 
@@ -80,9 +77,13 @@ const HomeScreen = () => {
 
       //TODO when QUERYING on DB, cant pass EMPTY ARRAY, value is required!
       const passedUserIds = passes.length > 0 ? passes : ["test"];
-      const swipedUserIds = passes.length > 0 ? swipes : ["test"];
+      const swipedUserIds = swipes.length > 0 ? swipes : ["test"];
 
-      console.log([...passedUserIds, ...swipedUserIds]);
+      // console.log("NOPED followed by Right SWIPED", [
+      //   passedUserIds,
+      //   swipedUserIds,
+      // ]);
+
       unsub = onSnapshot(
         query(
           collection(db, "users"),
@@ -116,7 +117,7 @@ const HomeScreen = () => {
     //if swiped on card, if card isnt in profiles[], dont interact with DB
 
     const userSwiped = profiles[cardIndex];
-    console.log(`You swiped NOOPE on ${userSwiped.displayName}`);
+    // console.log(`You swiped NOOPE on ${userSwiped.displayName}`);
 
     //TODO go into the database->users->userID->passes/NOPES collection of this particular user->userSwiped ki ID
     setDoc(
@@ -130,14 +131,24 @@ const HomeScreen = () => {
     //get that user's data
     const userSwiped = profiles[cardIndex];
 
-    console.log("USERSWIPED:", userSwiped);
-    console.log("USER:", user);
+    // console.log("USERSWIPED:", userSwiped);
+    // console.log("USER:", user);
 
+    // TODO IS THIS NECESSARY THOUGH>?>?>?>??>?
     //TODO once first AWAIT is loaded, then get data from second AWAIT
-    const loggedInProfile = await (
-      await getDoc(doc(db, "users", user.uid))
-    ).data();
-    console.log("Logged In", loggedInProfile);
+    const loggedInProfile = await getDoc(doc(db, "users", user.uid)).then(
+      (userData) =>
+        // console.log("userData.data:", userData.data());
+        userData.data()
+    );
+
+    // await(
+    //   await getDoc(doc(db, "users", user.uid))
+    // ).data();
+    // console.log("Logged In Profile:", loggedInProfile);
+    // console.log("User:", user.providerData);
+    // console.log("userSwiped:", userSwiped);
+
     //Check if user swiped on you...
     //TODO IMPORTANT 3:56:45
     //A MATCH MADE SHOULD BE ON SERVER (put this code on cloud), else
@@ -148,7 +159,7 @@ const HomeScreen = () => {
       (documentSnapshot) => {
         if (documentSnapshot.exists()) {
           //user already swiped on you => MATCH!
-          console.log(`YOU MATCHED WITH ${userSwiped.displayName}`);
+          // console.log(`YOU MATCHED WITH ${userSwiped.displayName}`);
 
           //swipe recorded first
           setDoc(
@@ -159,13 +170,13 @@ const HomeScreen = () => {
           //create the MATCH!
           //TODO user1.uid+user2.uid = matchID WHICH will always be unique !
 
-          setDoc(doc(db, "matches", generatedId(user.uid, userSwiped.id)), {
+          setDoc(doc(db, "matches", generateId(user.uid, userSwiped.id)), {
             //info to be set, //TODO IMPORTANT PART
 
             users: {
               //object, not array
               [user.uid]: loggedInProfile,
-              [userSwiped.uid]: userSwiped, //tell which user is which
+              [userSwiped.id]: userSwiped, //tell which user is which
             },
 
             usersMatched: [user.uid, userSwiped.id], //string comparison check
@@ -180,7 +191,7 @@ const HomeScreen = () => {
         } else {
           //you swiped as the first of the two, or didnt get swiped
           //user has swiped
-          console.log(`You SWIPED for MATCH on ${userSwiped.displayName}`);
+          // console.log(`You SWIPED for MATCH on ${userSwiped.displayName}`);
 
           setDoc(
             doc(db, "users", user.uid, "swipes", userSwiped.id),
@@ -237,11 +248,11 @@ const HomeScreen = () => {
 
           //TODO pass the cardINDEX along with the swipe, so we know which card got what swiped
           onSwipedLeft={(cardIndex) => {
-            console.log("SWIPED NOPE!");
+            // console.log("SWIPED NOPE!");
             swipeLeft(cardIndex);
           }}
           onSwipedRight={(cardIndex) => {
-            console.log("SWiped MATCH!");
+            // console.log("SWiped MATCH!");
             swipeRight(cardIndex);
           }}
           //ending SWIPE FUNCTIONS

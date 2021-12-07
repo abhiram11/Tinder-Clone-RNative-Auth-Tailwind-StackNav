@@ -66,7 +66,7 @@ const MessageScreen = () => {
       message: input,
     });
 
-    console.log("Msg Sent to firebase successfully");
+    // console.log("Msg Sent to firebase successfully");
     setInput("");
   };
 

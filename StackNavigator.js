@@ -35,7 +35,7 @@ const StackNavigator = () => {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{ headerShown: true }} //TODO make it false later
+          options={{ headerShown: false }} //TODO make it false later
         />
       )}
     </Stack.Navigator>
