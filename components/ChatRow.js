@@ -23,7 +23,7 @@ const ChatRow = ({ matchDetails }) => {
     setMatchedUserInfo(getMatchedUserInfo(matchDetails.users, user.uid));
   }, [matchDetails, user]);
 
-  console.log("matcheduserinfo:", matchedUserInfo);
+  // console.log("matcheduserinfo:", matchedUserInfo);
 
   useEffect(
     () =>
@@ -40,7 +40,7 @@ const ChatRow = ({ matchDetails }) => {
     [matchDetails, db]
   );
 
-  console.log("matcheduserinfo:", matchedUserInfo);
+  // console.log("matcheduserinfo:", matchedUserInfo);
   return (
     <TouchableOpacity
       style={[

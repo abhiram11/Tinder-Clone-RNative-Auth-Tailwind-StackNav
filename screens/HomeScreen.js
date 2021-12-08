@@ -203,7 +203,7 @@ const HomeScreen = () => {
   };
 
   return (
-    <View style={tw("flex-1 my-5")}>
+    <View style={tw("flex-1 my-8")}>
       {/* header */}
       {/* can add justify-between, flex-row, and then (px-5)padding/margin(mx-5) horizontal and try it too
       then remove the absolute right left specs for others */}
