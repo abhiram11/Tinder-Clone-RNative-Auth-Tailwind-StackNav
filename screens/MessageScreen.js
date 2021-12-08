@@ -34,6 +34,8 @@ const MessageScreen = () => {
 
   const { matchDetails } = params;
 
+  console.log("MESSAGE SCREEN matchDetails:", matchDetails);
+
   //real time listener of chats ========= useEffect and onSnapshot!!!!!!!!
   useEffect(
     () =>
@@ -62,7 +64,7 @@ const MessageScreen = () => {
       timestamp: serverTimestamp(),
       userId: user.uid,
       displayName: user.displayName,
-      photoURL: matchDetails.users[user.uid.photoURL], //TODO the person's DP that they UPLOADED during profile details making
+      photoURL: matchDetails.users[user.uid].photoURL, //TODO the person's DP that they UPLOADED during profile details making
       message: input,
     });
 
@@ -71,7 +73,7 @@ const MessageScreen = () => {
   };
 
   return (
-    <View style={tw("flex-1 mt-10")}>
+    <View style={tw("flex-1 mt-6")}>
       <Header
         title={getMatchedUserInfo(matchDetails?.users, user.uid).displayName}
         callEnabled

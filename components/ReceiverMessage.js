@@ -6,7 +6,7 @@ const ReceiverMessage = ({ message }) => {
   return (
     <View
       style={[
-        tw("bg-purple-600 rounded-lg rounded-tr-none px-5 py-3 mx-3 my-2"),
+        tw("bg-pink-600 rounded-lg rounded-tr-none px-5 py-3 mx-14 my-4"),
         { alignSelf: "flex-start" }, //TODO flex-start makes it take only required space
         //else it will go full length, and then marginleft makes left margin SUPER HUGE so msg becomes RHS sticked
       ]}

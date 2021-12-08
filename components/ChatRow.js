@@ -11,15 +11,19 @@ const ChatRow = ({ matchDetails }) => {
   const navigation = useNavigation();
   const { user } = useAuth();
 
+  // console.log("matchDetails:", matchDetails);
+
   //use utility fn to remove the other users info from the collection match
   const [matchedUserInfo, setMatchedUserInfo] = useState(null);
   const [lastMessage, setLastMessage] = useState("");
 
-  console.log("matchDetails.user, user.uid", matchDetails.user, user.uid);
+  // console.log("matchDetails.user, user.uid", matchDetails.users, user.uid);
 
   useEffect(() => {
-    setMatchedUserInfo(getMatchedUserInfo(matchDetails.user, user.uid));
+    setMatchedUserInfo(getMatchedUserInfo(matchDetails.users, user.uid));
   }, [matchDetails, user]);
+
+  console.log("matcheduserinfo:", matchedUserInfo);
 
   useEffect(
     () =>

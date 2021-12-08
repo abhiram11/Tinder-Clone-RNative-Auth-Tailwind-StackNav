@@ -35,6 +35,9 @@ const ModalScreen = () => {
     })
       .then(() => {
         //close the modal after you're done
+        setImage(null);
+        setJob(null);
+        setAge(null);
         navigation.navigate("Home");
       })
       .catch((error) => {
