@@ -11,6 +11,8 @@ npm-debug.*
 web-build/
 firebase.js
 hooks/useAuth.js
+google-services.json
+GoogleService-Info.plist
 
 # macOS
 .DS_Store
