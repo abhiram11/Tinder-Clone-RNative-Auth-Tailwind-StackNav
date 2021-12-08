@@ -43,7 +43,7 @@ const MatchedScreen = () => {
           navigation.navigate("Chat");
         }}
       >
-        <Text style={tw("text-center")}>Send a Message!</Text>
+        <Text style={tw("text-center text-lg")}>Send a Message!</Text>
       </TouchableOpacity>
     </View>
   );

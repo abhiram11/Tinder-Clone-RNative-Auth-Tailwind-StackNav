@@ -34,7 +34,7 @@ const MessageScreen = () => {
 
   const { matchDetails } = params;
 
-  console.log("MESSAGE SCREEN matchDetails:", matchDetails);
+  // console.log("MESSAGE SCREEN matchDetails:", matchDetails);
 
   //real time listener of chats ========= useEffect and onSnapshot!!!!!!!!
   useEffect(

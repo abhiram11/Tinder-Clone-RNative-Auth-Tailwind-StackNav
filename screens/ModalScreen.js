@@ -14,8 +14,9 @@ const ModalScreen = () => {
   const [image, setImage] = useState(null);
   const [job, setJob] = useState(null);
   const [age, setAge] = useState(null);
+  const [username, setUsername] = useState(null);
 
-  const incompleteForm = !image || !job || !age;
+  const incompleteForm = !image || !job || !age || !username;
 
   const updateUserProfile = () => {
     //firebase v9 MODULAR Functions
@@ -27,7 +28,7 @@ const ModalScreen = () => {
 
       //TODO error => right hand side me hi kuch error hogi
       id: user.uid,
-      displayName: user.displayName,
+      displayName: username,
       photoURL: image,
       job: job,
       age: age,
@@ -38,6 +39,7 @@ const ModalScreen = () => {
         setImage(null);
         setJob(null);
         setAge(null);
+        setUsername(null);
         navigation.navigate("Home");
       })
       .catch((error) => {
@@ -88,6 +90,15 @@ const ModalScreen = () => {
         //validation
         maxLength={2}
         keyboardType="numeric"
+      />
+      <Text style={tw("text-center text-red-400 p-4 font-bold")}>
+        Step 4: Display Name
+      </Text>
+      <TextInput
+        value={username}
+        onChangeText={setUsername}
+        style={tw("text-center text-xl pb-2 ")}
+        placeholder="Enter Name"
       />
 
       <TouchableOpacity

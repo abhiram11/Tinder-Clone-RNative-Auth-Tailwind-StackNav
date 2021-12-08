@@ -33,7 +33,7 @@ const ChatList = () => {
     [user]
   );
 
-  console.log("matches:", matches);
+  // console.log("matches:", matches);
 
   return matches.length > 0 ? (
     <FlatList
