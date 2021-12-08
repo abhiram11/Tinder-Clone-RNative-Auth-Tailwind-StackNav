@@ -9,6 +9,8 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
+firebase.js
+hooks/useAuth.js
 
 # macOS
 .DS_Store
