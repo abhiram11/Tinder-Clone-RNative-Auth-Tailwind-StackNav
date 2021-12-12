@@ -1,4 +1,4 @@
-# Tinder-Clone-RNative-Auth-Tailwind-StackNav [https://www.youtube.com/watch?v=PdPoZLLXtUY] Here
+# Tinder-Clone-RNative-Auth-Tailwind-StackNav 👉🏻 https://www.youtube.com/watch?v=PdPoZLLXtUY
 
 This app was made using React Native and Expo! 📲
 Styling and Icons: Tailwind (+ Stylesheet and traditional CSS, ALL AT ONCE) for React Native, Ionicons, Foundation, AntDesign, Entypo. 🍃 SEE MORE Below ! 👇🏻 
